@@ -52,16 +52,16 @@ Goal: confirm the existing project runs and dependencies are in place.
 
 Goal: all game rules exist as pure, testable code with no UI.
 
-- [ ] `lib/types.ts`: `Card`, `GameState`, `BestScore`, `BestScores`, `Action`.
-- [ ] `lib/shuffle.ts`: Fisher-Yates `shuffle<T>` and `makeDeck(pairs = 8)` using the 8 emoji symbols.
-- [ ] `lib/gameReducer.ts`: `initialState(cards)` and the reducer with `FLIP`, `RESOLVE`, `TICK`, `RESTART`.
-  - [ ] `FLIP` ignores taps when `locked` or `won`, on an already-flipped card, or on an already-matched card.
-  - [ ] First flip sets `started: true`; second flip increments `moves` and evaluates match or mismatch.
-  - [ ] Match adds the symbol to `matched` and sets `won` when all pairs are matched.
-  - [ ] Mismatch sets `locked: true` and keeps both cards in `flipped`.
-  - [ ] `RESOLVE` clears `flipped` and unlocks.
-  - [ ] `TICK` increments `seconds` only while `started && !won`.
-  - [ ] `RESTART` returns a fresh state from the new deck.
+- [x] `lib/types.ts`: `Card`, `GameState`, `BestScore`, `BestScores`, `Action`.
+- [x] `lib/shuffle.ts`: Fisher-Yates `shuffle<T>` and `makeDeck(pairs = 8)` using the 8 emoji symbols.
+- [x] `lib/gameReducer.ts`: `initialState(cards)` and the reducer with `FLIP`, `RESOLVE`, `TICK`, `RESTART`.
+  - [x] `FLIP` ignores taps when `locked` or `won`, on an already-flipped card, or on an already-matched card.
+  - [x] First flip sets `started: true`; second flip increments `moves` and evaluates match or mismatch.
+  - [x] Match adds the symbol to `matched` and sets `won` when all pairs are matched.
+  - [x] Mismatch sets `locked: true` and keeps both cards in `flipped`.
+  - [x] `RESOLVE` clears `flipped` and unlocks.
+  - [x] `TICK` increments `seconds` only while `started && !won`.
+  - [x] `RESTART` returns a fresh state from the new deck.
 - [ ] Unit tests (if Jest added): deck has each symbol exactly twice, same-card double tap, third tap while locked, matched-card tap, move counting.
 
 **Done when:** reducer behavior matches the MVP "Game rules" and the first five testing-checklist items hold in tests or by manual dispatch.
