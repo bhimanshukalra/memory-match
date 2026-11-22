@@ -14,10 +14,11 @@ type Props = {
   cards: Card[];
   flipped: number[];
   matched: Set<string>;
+  locked: boolean;
   onFlip: (index: number) => void;
 };
 
-export function Board({ cards, flipped, matched, onFlip }: Props) {
+export function Board({ cards, flipped, matched, locked, onFlip }: Props) {
   // Measured from the container (not useWindowDimensions) so the first render
   // is identical on server/client and never produces a negative size.
   const [width, setWidth] = useState(0);
@@ -37,7 +38,7 @@ export function Board({ cards, flipped, matched, onFlip }: Props) {
           numColumns={COLUMNS}
           scrollEnabled={false}
           keyExtractor={(card) => String(card.id)}
-          extraData={{ flipped, matched }}
+          extraData={{ flipped, matched, locked }}
           contentContainerStyle={styles.content}
           columnWrapperStyle={styles.row}
           renderItem={({ item, index }) => (
@@ -46,6 +47,8 @@ export function Board({ cards, flipped, matched, onFlip }: Props) {
               symbol={item.symbol}
               size={size}
               faceUp={flipped.includes(index) || matched.has(item.symbol)}
+              matched={matched.has(item.symbol)}
+              mismatched={locked && flipped.includes(index)}
               onPress={onFlip}
             />
           )}

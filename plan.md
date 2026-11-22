@@ -94,12 +94,12 @@ Goal: the full ruleset works end to end, still without animation.
 
 Goal: polished card feedback using Reanimated 4.
 
-- [ ] Check Reanimated 4 docs for the current API (`useSharedValue`, `useAnimatedStyle`, `withTiming`, `withSequence`, `withSpring`).
-- [ ] **Flip:** in `CardView`, one `rotation` shared value (0 to 180) driven by `withTiming(faceUp ? 180 : 0, { duration: 300 })`. Two absolutely positioned faces with `backfaceVisibility: "hidden"`; back uses `rotateY(rotation)`, front uses `rotateY(rotation + 180)`; `perspective: 800`.
-- [ ] **Match pulse:** `withSequence(withSpring(1.1), withSpring(1))` on scale and a green border when matched.
-- [ ] **Mismatch shake:** short `translateX` sequence on both cards just before they flip back.
-- [ ] **Win modal:** fade or scale-in entrance; optional confetti emoji.
-- [ ] Keep shared values stable (no re-creation per render) and keep `CardView` memoized with stable props (pass `index` and a stable `onPress`).
+- [x] Check Reanimated 4 docs for the current API (`useSharedValue`, `useAnimatedStyle`, `withTiming`, `withSequence`, `withSpring`).
+- [x] **Flip:** in `CardView`, one `rotation` shared value (0 to 180) driven by `withTiming(faceUp ? 180 : 0, { duration: 300 })`. Two absolutely positioned faces with `backfaceVisibility: "hidden"`; back uses `rotateY(rotation)`, front uses `rotateY(rotation + 180)`; `perspective: 800`.
+- [x] **Match pulse:** `withSequence(withSpring(1.1), withSpring(1))` on scale and a green border when matched.
+- [x] **Mismatch shake:** short `translateX` sequence on both cards just before they flip back.
+- [x] **Win modal:** fade or scale-in entrance; optional confetti emoji.
+- [x] Keep shared values stable (no re-creation per render) and keep `CardView` memoized with stable props (pass `index` and a stable `onPress`).
 
 **Done when:** flips, pulses and shakes look smooth and do not break input locking.
 

@@ -18,6 +18,7 @@ export function GameScreen() {
           cards={state.cards}
           flipped={state.flipped}
           matched={state.matched}
+          locked={state.locked}
           onFlip={flip}
         />
         <Pressable

@@ -1,4 +1,5 @@
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import Animated, { ZoomIn } from "react-native-reanimated";
 
 import { formatTime } from "@/lib/format";
 
@@ -18,7 +19,7 @@ export function WinModal({ visible, moves, seconds, onPlayAgain }: Props) {
       onRequestClose={onPlayAgain}
     >
       <View style={styles.backdrop}>
-        <View style={styles.card}>
+        <Animated.View entering={ZoomIn.springify()} style={styles.card}>
           <Text style={styles.title}>🎉 You won!</Text>
           <Text style={styles.line}>Moves: {moves}</Text>
           <Text style={styles.line}>Time: {formatTime(seconds)}</Text>
@@ -29,7 +30,7 @@ export function WinModal({ visible, moves, seconds, onPlayAgain }: Props) {
           >
             <Text style={styles.buttonText}>Play again</Text>
           </Pressable>
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   );
