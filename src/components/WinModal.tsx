@@ -7,10 +7,17 @@ type Props = {
   visible: boolean;
   moves: number;
   seconds: number;
+  isNewBest: boolean;
   onPlayAgain: () => void;
 };
 
-export function WinModal({ visible, moves, seconds, onPlayAgain }: Props) {
+export function WinModal({
+  visible,
+  moves,
+  seconds,
+  isNewBest,
+  onPlayAgain,
+}: Props) {
   return (
     <Modal
       visible={visible}
@@ -21,6 +28,11 @@ export function WinModal({ visible, moves, seconds, onPlayAgain }: Props) {
       <View style={styles.backdrop}>
         <Animated.View entering={ZoomIn.springify()} style={styles.card}>
           <Text style={styles.title}>🎉 You won!</Text>
+          {isNewBest && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>🏆 New best!</Text>
+            </View>
+          )}
           <Text style={styles.line}>Moves: {moves}</Text>
           <Text style={styles.line}>Time: {formatTime(seconds)}</Text>
           <Pressable
@@ -52,6 +64,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
   },
   title: { fontSize: 26, fontWeight: "800", color: "#312e81" },
+  badge: {
+    paddingVertical: 4,
+    paddingHorizontal: 12,
+    borderRadius: 999,
+    backgroundColor: "#fef3c7",
+  },
+  badgeText: { color: "#b45309", fontWeight: "700" },
   line: { fontSize: 18, color: "#4338ca" },
   button: {
     marginTop: 12,

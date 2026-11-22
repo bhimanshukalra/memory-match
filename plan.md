@@ -107,10 +107,10 @@ Goal: polished card feedback using Reanimated 4.
 
 Goal: best score per difficulty survives app restarts.
 
-- [ ] `lib/storage.ts`: `loadBest(diff)` and `saveBest(diff, score)` under key `memory-match:best`, with the "fewer moves, then fewer seconds" rule. Wrap every AsyncStorage call in try/catch and fall back gracefully.
-- [ ] Hook integration: load the best on mount; when `won` becomes true, compare against the stored best, save if beaten, and expose `isNewBest`.
-- [ ] Show the best in `StatsBar` and a "New best!" badge in `WinModal`.
-- [ ] Use the difficulty key `"4x4"` for now so difficulty levels can be added later.
+- [x] `lib/storage.ts`: `loadBest(diff)` and `saveBest(diff, score)` under key `memory-match:best`, with the "fewer moves, then fewer seconds" rule. Wrap every AsyncStorage call in try/catch and fall back gracefully.
+- [x] Hook integration: load the best on mount; when `won` becomes true, compare against the stored best, save if beaten, and expose `isNewBest`.
+- [x] Show the best in `StatsBar` and a "New best!" badge in `WinModal`.
+- [x] Use the difficulty key `"4x4"` for now so difficulty levels can be added later.
 
 **Done when:** best score persists after killing the app, only updates when beaten, and the game stays playable if storage throws.
 

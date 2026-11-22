@@ -8,12 +8,12 @@ import { StatsBar } from "./StatsBar";
 import { WinModal } from "./WinModal";
 
 export function GameScreen() {
-  const { state, flip, restart } = useMemoryGame();
+  const { state, best, isNewBest, flip, restart } = useMemoryGame();
 
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.center}>
-        <StatsBar moves={state.moves} seconds={state.seconds} />
+        <StatsBar moves={state.moves} seconds={state.seconds} best={best} />
         <Board
           cards={state.cards}
           flipped={state.flipped}
@@ -33,6 +33,7 @@ export function GameScreen() {
         visible={state.won}
         moves={state.moves}
         seconds={state.seconds}
+        isNewBest={isNewBest}
         onPlayAgain={restart}
       />
     </SafeAreaView>

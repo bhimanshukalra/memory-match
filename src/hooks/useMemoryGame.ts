@@ -1,14 +1,41 @@
-import { useCallback, useEffect, useReducer } from "react";
+import { useCallback, useEffect, useReducer, useState } from "react";
 
 import { gameReducer, initialState } from "@/lib/gameReducer";
 import { makeDeck } from "@/lib/shuffle";
+import { isBetter, loadBest, saveBest } from "@/lib/storage";
+import type { BestScore } from "@/lib/types";
 
 const MISMATCH_DELAY_MS = 800;
+const DIFFICULTY = "4x4";
 
 export function useMemoryGame() {
   const [state, dispatch] = useReducer(gameReducer, undefined, () =>
     initialState(makeDeck()),
   );
+  // Best score as of the start of the current game.
+  const [best, setBest] = useState<BestScore | null>(null);
+
+  const score = { moves: state.moves, seconds: state.seconds };
+  // Derived: works even if storage fails, since `best` is also held in memory.
+  const isNewBest = state.won && isBetter(score, best);
+  const displayBest = isNewBest ? score : best;
+
+  // Load the stored best once on mount.
+  useEffect(() => {
+    let cancelled = false;
+    loadBest(DIFFICULTY).then((b) => {
+      if (!cancelled) setBest(b);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // On a new best, persist it in the background (never throws).
+  useEffect(() => {
+    if (!isNewBest) return;
+    saveBest(DIFFICULTY, { moves: state.moves, seconds: state.seconds });
+  }, [isNewBest, state.moves, state.seconds]);
 
   // Mismatch: keep both cards visible briefly, then flip back. Input is locked
   // meanwhile. Cleanup also cancels the pending timeout on restart/unmount.
@@ -29,10 +56,11 @@ export function useMemoryGame() {
     (index: number) => dispatch({ type: "FLIP", index }),
     [],
   );
-  const restart = useCallback(
-    () => dispatch({ type: "RESTART", cards: makeDeck() }),
-    [],
-  );
+  const restart = useCallback(() => {
+    // Fold a just-achieved best into memory before the next game starts.
+    if (isNewBest) setBest({ moves: state.moves, seconds: state.seconds });
+    dispatch({ type: "RESTART", cards: makeDeck() });
+  }, [isNewBest, state.moves, state.seconds]);
 
-  return { state, flip, restart };
+  return { state, best: displayBest, isNewBest, flip, restart };
 }
