@@ -1,31 +1,52 @@
-import { useCallback, useEffect, useReducer, useState } from "react";
+import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 
+import { announce } from "@/lib/announce";
+import {
+  DEFAULT_DIFFICULTY,
+  findDifficulty,
+  type Difficulty,
+} from "@/lib/difficulty";
 import { gameReducer, initialState } from "@/lib/gameReducer";
 import { successHaptic, tapHaptic, warningHaptic } from "@/lib/haptics";
 import { makeDeck } from "@/lib/shuffle";
-import { isBetter, loadBest, saveBest } from "@/lib/storage";
-import type { BestScore } from "@/lib/types";
+import {
+  isBetter,
+  loadAllBest,
+  loadDifficultyKey,
+  saveBest,
+  saveDifficultyKey,
+} from "@/lib/storage";
+import type { BestScores } from "@/lib/types";
 
-const MISMATCH_DELAY_MS = 800;
-const DIFFICULTY = "4x4";
+export const MISMATCH_DELAY_MS = 800;
 
 export function useMemoryGame() {
-  const [state, dispatch] = useReducer(gameReducer, undefined, () =>
-    initialState(makeDeck()),
+  const [difficulty, setDifficultyState] = useState<Difficulty>(
+    DEFAULT_DIFFICULTY,
   );
-  // Best score as of the start of the current game.
-  const [best, setBest] = useState<BestScore | null>(null);
+  const [state, dispatch] = useReducer(gameReducer, undefined, () =>
+    initialState(makeDeck(DEFAULT_DIFFICULTY.pairs)),
+  );
+  // Best scores as of the start of the current game, for every difficulty.
+  const [bests, setBests] = useState<BestScores>({});
 
+  const best = bests[difficulty.key] ?? null;
   const score = { moves: state.moves, seconds: state.seconds };
-  // Derived: works even if storage fails, since `best` is also held in memory.
+  // Derived: works even if storage fails, since `bests` is also held in memory.
   const isNewBest = state.won && isBetter(score, best);
   const displayBest = isNewBest ? score : best;
 
-  // Load the stored best once on mount.
+  // Load persisted best scores and the last-used difficulty once on mount.
   useEffect(() => {
     let cancelled = false;
-    loadBest(DIFFICULTY).then((b) => {
-      if (!cancelled) setBest(b);
+    Promise.all([loadAllBest(), loadDifficultyKey()]).then(([all, key]) => {
+      if (cancelled) return;
+      setBests((prev) => ({ ...all, ...prev }));
+      const saved = findDifficulty(key);
+      if (saved.key !== DEFAULT_DIFFICULTY.key) {
+        setDifficultyState(saved);
+        dispatch({ type: "RESTART", cards: makeDeck(saved.pairs) });
+      }
     });
     return () => {
       cancelled = true;
@@ -35,22 +56,31 @@ export function useMemoryGame() {
   // On a new best, persist it in the background (never throws).
   useEffect(() => {
     if (!isNewBest) return;
-    saveBest(DIFFICULTY, { moves: state.moves, seconds: state.seconds });
-  }, [isNewBest, state.moves, state.seconds]);
+    saveBest(difficulty.key, { moves: state.moves, seconds: state.seconds });
+  }, [isNewBest, difficulty.key, state.moves, state.seconds]);
 
-  // Haptics: tap on flip, success on match/win, warning on mismatch.
+  // Feedback (haptics + screen-reader announcements), driven by what changed
+  // since the previous state so every event fires exactly once: a final match
+  // is a win, not also a match; a mismatch is a warning, not also a tap.
+  const prev = useRef(state);
   useEffect(() => {
-    if (state.flipped.length > 0) tapHaptic();
-  }, [state.flipped]);
-  useEffect(() => {
-    if (state.matched.size > 0) successHaptic();
-  }, [state.matched]);
-  useEffect(() => {
-    if (state.locked) warningHaptic();
-  }, [state.locked]);
-  useEffect(() => {
-    if (state.won) successHaptic();
-  }, [state.won]);
+    const before = prev.current;
+    prev.current = state;
+    if (state.won && !before.won) {
+      successHaptic();
+      announce(
+        `You won in ${state.moves} ${state.moves === 1 ? "move" : "moves"}`,
+      );
+    } else if (state.matched.size > before.matched.size) {
+      successHaptic();
+      announce("Match");
+    } else if (state.locked && !before.locked) {
+      warningHaptic();
+      announce("No match");
+    } else if (state.flipped.length > before.flipped.length) {
+      tapHaptic();
+    }
+  }, [state]);
 
   // Mismatch: keep both cards visible briefly, then flip back. Input is locked
   // meanwhile. Cleanup also cancels the pending timeout on restart/unmount.
@@ -71,11 +101,40 @@ export function useMemoryGame() {
     (index: number) => dispatch({ type: "FLIP", index }),
     [],
   );
-  const restart = useCallback(() => {
-    // Fold a just-achieved best into memory before the next game starts.
-    if (isNewBest) setBest({ moves: state.moves, seconds: state.seconds });
-    dispatch({ type: "RESTART", cards: makeDeck() });
-  }, [isNewBest, state.moves, state.seconds]);
 
-  return { state, best: displayBest, isNewBest, flip, restart };
+  // Fold a just-achieved best into memory before the next game starts.
+  const foldBest = useCallback(() => {
+    if (isNewBest) {
+      setBests((prevBests) => ({
+        ...prevBests,
+        [difficulty.key]: { moves: state.moves, seconds: state.seconds },
+      }));
+    }
+  }, [isNewBest, difficulty.key, state.moves, state.seconds]);
+
+  const restart = useCallback(() => {
+    foldBest();
+    dispatch({ type: "RESTART", cards: makeDeck(difficulty.pairs) });
+  }, [foldBest, difficulty.pairs]);
+
+  const setDifficulty = useCallback(
+    (next: Difficulty) => {
+      if (next.key === difficulty.key) return;
+      foldBest();
+      setDifficultyState(next);
+      saveDifficultyKey(next.key);
+      dispatch({ type: "RESTART", cards: makeDeck(next.pairs) });
+    },
+    [foldBest, difficulty.key],
+  );
+
+  return {
+    state,
+    best: displayBest,
+    isNewBest,
+    difficulty,
+    setDifficulty,
+    flip,
+    restart,
+  };
 }
