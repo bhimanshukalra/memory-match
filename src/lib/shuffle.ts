@@ -1,3 +1,4 @@
+import { SYMBOLS } from "./symbols";
 import type { Card } from "./types";
 
 export function shuffle<T>(arr: T[]): T[] {
@@ -9,9 +10,11 @@ export function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-export const SYMBOLS = ["🍎", "🐶", "🚀", "🎲", "🌵", "🎧", "🦊", "⚡"];
-
-export const makeDeck = (pairs = 8): Card[] =>
-  shuffle(SYMBOLS.slice(0, pairs).flatMap((s) => [s, s])).map(
+export const makeDeck = (pairs = 8): Card[] => {
+  if (pairs < 1 || pairs > SYMBOLS.length) {
+    throw new RangeError(`pairs must be between 1 and ${SYMBOLS.length}`);
+  }
+  return shuffle(SYMBOLS.slice(0, pairs).flatMap((s) => [s, s])).map(
     (symbol, id) => ({ id, symbol }),
   );
+};
