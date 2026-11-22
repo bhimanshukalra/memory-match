@@ -82,11 +82,11 @@ Goal: tap-to-reveal board on screen using plain conditional rendering.
 
 Goal: the full ruleset works end to end, still without animation.
 
-- [ ] Mismatch delay effect in the hook: when `locked`, `setTimeout(RESOLVE, 800)` with cleanup.
-- [ ] Timer effect: `setInterval(TICK, 1000)` while `started && !won`; clear on unmount and on win.
-- [ ] `components/StatsBar.tsx`: moves, elapsed time (`m:ss`), best score (placeholder `--` for now).
-- [ ] Restart button in `GameScreen` that dispatches `RESTART` with a new `makeDeck()`. Make sure pending timeouts and the lock are cleared (effects keyed on state handle this).
-- [ ] `components/WinModal.tsx`: React Native `Modal` (or an overlay) showing final moves and time, and a "Play again" button.
+- [x] Mismatch delay effect in the hook: when `locked`, `setTimeout(RESOLVE, 800)` with cleanup.
+- [x] Timer effect: `setInterval(TICK, 1000)` while `started && !won`; clear on unmount and on win.
+- [x] `components/StatsBar.tsx`: moves, elapsed time (`m:ss`), best score (placeholder `--` for now).
+- [x] Restart button in `GameScreen` that dispatches `RESTART` with a new `makeDeck()`. Make sure pending timeouts and the lock are cleared (effects keyed on state handle this).
+- [x] `components/WinModal.tsx`: React Native `Modal` (or an overlay) showing final moves and time, and a "Play again" button.
 
 **Done when:** a full game is playable start to finish; checklist items on moves, timer, mismatch flip-back, win modal and mid-game restart pass.
 
