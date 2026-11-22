@@ -130,8 +130,10 @@ Goal: finished feel on a real device.
 Goal: pass the MVP testing checklist on a real device.
 
 - [ ] Walk the full checklist in [MVP.md](MVP.md#testing-checklist) on a physical iOS and Android device (or emulators plus one real device).
-- [ ] Profile animations on a mid-range Android device; reduce work per card if frames drop.
-- [ ] `npx expo-doctor`, `npx expo lint`, `npx tsc --noEmit` all clean.
+  - Done so far (web preview + iOS Simulator dev build on iPhone 17 Pro): deck pairs and shuffle, same-card double tap, third tap during lock, matched-card tap, move counting, timer start/stop/reset, flip-back, win modal, best score save/persist/only-when-beaten, storage failure, restart mid-game, grid at phone/landscape/tablet sizes.
+  - Still open: Android (device or emulator), a real physical device, haptics feedback (not felt in the simulator or web), and the iOS Simulator run covered only a short manual play.
+- [ ] Profile animations on a mid-range Android device (not done: no Android device available); reduce work per card if frames drop.
+- [x] `npx expo-doctor`, `npx expo lint`, `npx tsc --noEmit` all clean.
 - [ ] (Optional) `eas build --profile preview` for a shareable build.
 
 **Done when:** every checklist item is checked and the lint, typecheck and doctor checks pass.
