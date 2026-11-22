@@ -99,7 +99,3 @@ Before a store release, replace the bundle identifier and Android package in `ap
 ## Background
 
 `MVP.md` is the original one-day build guide and `plan.md` is the phased plan this app was built from.
-
-## License
-
-See [LICENSE](LICENSE).
