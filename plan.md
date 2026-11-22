@@ -70,11 +70,11 @@ Goal: all game rules exist as pure, testable code with no UI.
 
 Goal: tap-to-reveal board on screen using plain conditional rendering.
 
-- [ ] `hooks/useMemoryGame.ts`: `useReducer` with the reducer and a lazily built initial deck; expose `state`, `flip(index)`, `restart()`.
-- [ ] `components/CardView.tsx`: `Pressable` showing the symbol if face up, else a card back. Face-up rule: index in `flipped` or symbol in `matched`. Wrap in `React.memo`.
-- [ ] `components/Board.tsx`: compute card size from `useWindowDimensions` (columns, gap, padding) and render the grid with `FlatList numColumns={4}` or flex-wrap. Keep cards square.
-- [ ] `components/GameScreen.tsx`: renders `Board`, wrapped in `SafeAreaView`.
-- [ ] `src/app/index.tsx`: render `GameScreen`; set `_layout.tsx` to hide the header.
+- [x] `hooks/useMemoryGame.ts`: `useReducer` with the reducer and a lazily built initial deck; expose `state`, `flip(index)`, `restart()`.
+- [x] `components/CardView.tsx`: `Pressable` showing the symbol if face up, else a card back. Face-up rule: index in `flipped` or symbol in `matched`. Wrap in `React.memo`.
+- [x] `components/Board.tsx`: compute card size from `useWindowDimensions` (columns, gap, padding) and render the grid with `FlatList numColumns={4}` or flex-wrap. Keep cards square.
+- [x] `components/GameScreen.tsx`: renders `Board`, wrapped in `SafeAreaView`.
+- [x] `src/app/index.tsx`: render `GameScreen`; set `_layout.tsx` to hide the header.
 
 **Done when:** you can tap cards and see symbols reveal on a shuffled 4x4 grid.
 
