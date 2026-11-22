@@ -40,10 +40,10 @@ src/
 
 Goal: confirm the existing project runs and dependencies are in place.
 
-- [ ] Read `src/app/_layout.tsx` and `src/app/index.tsx`; note what boilerplate to replace.
+- [x] Read `src/app/_layout.tsx` and `src/app/index.tsx`; note what boilerplate to replace.
 - [ ] Run `npx expo start` and confirm the app boots on a simulator or device.
-- [ ] `npx expo install @react-native-async-storage/async-storage expo-haptics`
-- [ ] Create the folders `src/components`, `src/hooks`, `src/lib`.
+- [x] `npx expo install @react-native-async-storage/async-storage expo-haptics`
+- [x] Create the folders `src/components`, `src/hooks`, `src/lib`.
 - [ ] (Optional) Add Jest via `npx expo install jest-expo jest @types/jest` for reducer tests.
 
 **Done when:** app boots, dependencies installed, lint and typecheck pass.
