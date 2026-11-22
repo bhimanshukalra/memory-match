@@ -6,6 +6,7 @@ import { useMemoryGame } from "@/hooks/useMemoryGame";
 import { useTheme } from "@/lib/theme";
 
 import { Board } from "./Board";
+import { DifficultyPicker } from "./DifficultyPicker";
 import { StatsBar } from "./StatsBar";
 import { WinModal } from "./WinModal";
 
@@ -16,12 +17,20 @@ const WIDE_RATIO = 1.2;
 
 export function GameScreen() {
   const theme = useTheme();
-  const { state, best, isNewBest, flip, restart } = useMemoryGame();
+  const { state, best, isNewBest, difficulty, setDifficulty, flip, restart } =
+    useMemoryGame();
 
   // Measured from the container (not useWindowDimensions) so the first render
   // is the same on server and client; it starts out narrow until measured.
   const [box, setBox] = useState({ width: 0, height: 0 });
   const wide = box.width > box.height * WIDE_RATIO;
+
+  // The grid is cols x rows in portrait; in the wide layout lay it out
+  // landscape (the longer side horizontal) so cards stay large.
+  const columns = wide ? Math.max(difficulty.cols, difficulty.rows) : difficulty.cols;
+  const rows = wide ? Math.min(difficulty.cols, difficulty.rows) : difficulty.rows;
+
+  const picker = <DifficultyPicker value={difficulty} onChange={setDifficulty} />;
 
   const restartButton = (
     <Pressable
@@ -30,14 +39,20 @@ export function GameScreen() {
       style={[styles.restart, { backgroundColor: theme.button }]}
     >
       <Text style={[styles.restartText, { color: theme.buttonText }]}>
-        Restart
+        ↻  Restart
       </Text>
     </Pressable>
+  );
+
+  const header = (
+    <Text style={[styles.title, { color: theme.accent }]}>✦ Memory Match</Text>
   );
 
   const board = (
     <Board
       cards={state.cards}
+      columns={columns}
+      rows={rows}
       flipped={state.flipped}
       matched={state.matched}
       locked={state.locked}
@@ -58,6 +73,8 @@ export function GameScreen() {
           <>
             {board}
             <View style={styles.sidePanel}>
+              {header}
+              {picker}
               <StatsBar
                 layout="column"
                 moves={state.moves}
@@ -69,6 +86,8 @@ export function GameScreen() {
           </>
         ) : (
           <>
+            {header}
+            {picker}
             <StatsBar moves={state.moves} seconds={state.seconds} best={best} />
             {board}
             {restartButton}
@@ -88,7 +107,7 @@ export function GameScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
-  column: { flex: 1, alignItems: "center", gap: 8, paddingBottom: 12 },
+  column: { flex: 1, alignItems: "center", gap: 12, paddingBottom: 12, paddingTop: 8 },
   row: {
     flex: 1,
     flexDirection: "row",
@@ -100,7 +119,7 @@ const styles = StyleSheet.create({
   },
   sidePanel: {
     alignSelf: "center",
-    width: 240,
+    width: 290,
     alignItems: "center",
     justifyContent: "center",
     gap: 16,
@@ -108,7 +127,8 @@ const styles = StyleSheet.create({
   restart: {
     paddingVertical: 12,
     paddingHorizontal: 28,
-    borderRadius: 12,
+    borderRadius: 999,
   },
+  title: { fontSize: 20, fontWeight: "700", letterSpacing: 0.5 },
   restartText: { fontSize: 16, fontWeight: "700" },
 });

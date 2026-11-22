@@ -1,34 +1,46 @@
 import { useState } from "react";
-import { FlatList, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
+import { useTheme } from "@/lib/theme";
 import type { Card } from "@/lib/types";
 
 import { CardView } from "./CardView";
 
-const COLUMNS = 4;
-const ROWS = 4;
 const GAP = 10;
-const PADDING = 16;
+const PADDING = 12;
+const MARGIN = 12;
 const MAX_BOARD_WIDTH = 640;
 const MAX_CARD_SIZE = 150;
 
 type Props = {
   cards: Card[];
+  columns: number;
+  rows: number;
   flipped: number[];
   matched: Set<string>;
   locked: boolean;
   onFlip: (index: number) => void;
 };
 
-export function Board({ cards, flipped, matched, locked, onFlip }: Props) {
+export function Board({
+  cards,
+  columns,
+  rows,
+  flipped,
+  matched,
+  locked,
+  onFlip,
+}: Props) {
   // Measured from the container (not useWindowDimensions) so the first render
   // is identical on server/client and never produces a negative size. Both
   // dimensions count, so the board also fits short (landscape) screens.
+  const theme = useTheme();
   const [box, setBox] = useState({ width: 0, height: 0 });
-  const fitW = (box.width - PADDING * 2 - GAP * (COLUMNS - 1)) / COLUMNS;
-  const fitH = (box.height - PADDING * 2 - GAP * (ROWS - 1)) / ROWS;
+  const fitW =
+    (box.width - MARGIN * 2 - PADDING * 2 - GAP * (columns - 1)) / columns;
+  const fitH = (box.height - MARGIN * 2 - PADDING * 2 - GAP * (rows - 1)) / rows;
   const size = Math.max(0, Math.floor(Math.min(fitW, fitH, MAX_CARD_SIZE)));
-  const boardWidth = size * COLUMNS + GAP * (COLUMNS - 1) + PADDING * 2;
+  const boardWidth = size * columns + GAP * (columns - 1) + PADDING * 2;
 
   return (
     <View
@@ -39,27 +51,25 @@ export function Board({ cards, flipped, matched, locked, onFlip }: Props) {
       }}
     >
       {size > 0 && (
-        <FlatList
-          data={cards}
-          numColumns={COLUMNS}
-          scrollEnabled={false}
-          keyExtractor={(card) => String(card.id)}
-          extraData={{ flipped, matched, locked }}
-          style={{ flexGrow: 0, width: boardWidth }}
-          contentContainerStyle={styles.content}
-          columnWrapperStyle={styles.row}
-          renderItem={({ item, index }) => (
+        <View
+          style={[
+            styles.board,
+            { width: boardWidth, backgroundColor: theme.tray },
+          ]}
+        >
+          {cards.map((card, index) => (
             <CardView
+              key={card.id}
               index={index}
-              symbol={item.symbol}
+              symbol={card.symbol}
               size={size}
-              faceUp={flipped.includes(index) || matched.has(item.symbol)}
-              matched={matched.has(item.symbol)}
+              faceUp={flipped.includes(index) || matched.has(card.symbol)}
+              matched={matched.has(card.symbol)}
               mismatched={locked && flipped.includes(index)}
               onPress={onFlip}
             />
-          )}
-        />
+          ))}
+        </View>
       )}
     </View>
   );
@@ -73,6 +83,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  content: { padding: PADDING, gap: GAP },
-  row: { gap: GAP },
+  board: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: GAP,
+    padding: PADDING,
+    borderRadius: 20,
+  },
 });

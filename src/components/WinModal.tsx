@@ -1,5 +1,5 @@
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
-import Animated, { ZoomIn } from "react-native-reanimated";
+import Animated, { FadeIn, useReducedMotion, ZoomIn } from "react-native-reanimated";
 
 import { formatTime } from "@/lib/format";
 import { useTheme } from "@/lib/theme";
@@ -20,6 +20,7 @@ export function WinModal({
   onPlayAgain,
 }: Props) {
   const theme = useTheme();
+  const reduceMotion = useReducedMotion();
   return (
     <Modal
       visible={visible}
@@ -27,15 +28,23 @@ export function WinModal({
       animationType="fade"
       onRequestClose={onPlayAgain}
     >
-      <View style={[styles.backdrop, { backgroundColor: theme.backdrop }]}>
+      <View
+        accessibilityViewIsModal
+        style={[styles.backdrop, { backgroundColor: theme.backdrop }]}
+      >
         <Animated.View
-          entering={ZoomIn.springify()}
+          entering={reduceMotion ? FadeIn : ZoomIn.springify()}
           style={[styles.card, { backgroundColor: theme.modalBg }]}
         >
-          <Text style={[styles.title, { color: theme.modalTitle }]}>🎉 You won!</Text>
+          <Text
+            accessibilityRole="header"
+            style={[styles.title, { color: theme.modalTitle }]}
+          >
+            ✦ You won ✦
+          </Text>
           {isNewBest && (
             <View style={[styles.badge, { backgroundColor: theme.badgeBg }]}>
-              <Text style={[styles.badgeText, { color: theme.badgeText }]}>🏆 New best!</Text>
+              <Text style={[styles.badgeText, { color: theme.badgeText }]}>New best!</Text>
             </View>
           )}
           <Text style={[styles.line, { color: theme.modalText }]}>Moves: {moves}</Text>
@@ -62,7 +71,9 @@ const styles = StyleSheet.create({
   card: {
     width: 280,
     padding: 24,
-    borderRadius: 16,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: "#fbbf24",
     alignItems: "center",
     gap: 8,
   },
@@ -78,7 +89,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
     paddingVertical: 12,
     paddingHorizontal: 24,
-    borderRadius: 12,
+    borderRadius: 999,
   },
   buttonText: { fontSize: 16, fontWeight: "700" },
 });

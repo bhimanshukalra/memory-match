@@ -2,6 +2,7 @@ import { memo, useEffect } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
+  useReducedMotion,
   useSharedValue,
   withDelay,
   withSequence,
@@ -9,9 +10,17 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
+import { symbolName } from "@/lib/symbols";
 import { useTheme } from "@/lib/theme";
 
 const FLIP_MS = 300;
+const CORNERS = ["tl", "tr", "bl", "br"] as const;
+const PIP_POS = {
+  tl: { top: "17%", left: "17%" },
+  tr: { top: "17%", right: "17%" },
+  bl: { bottom: "17%", left: "17%" },
+  br: { bottom: "17%", right: "17%" },
+} as const;
 const PULSE_SPRING = { damping: 14, stiffness: 400 };
 
 type Props = {
@@ -34,26 +43,31 @@ function CardViewBase({
   onPress,
 }: Props) {
   const theme = useTheme();
+  const reduceMotion = useReducedMotion();
   const rotation = useSharedValue(faceUp ? 180 : 0);
   const scale = useSharedValue(1);
   const shake = useSharedValue(0);
 
+  // With "Reduce Motion" on, cards turn instantly and the pulse and shake are
+  // skipped entirely.
   useEffect(() => {
-    rotation.value = withTiming(faceUp ? 180 : 0, { duration: FLIP_MS });
-  }, [faceUp, rotation]);
+    rotation.value = withTiming(faceUp ? 180 : 0, {
+      duration: reduceMotion ? 0 : FLIP_MS,
+    });
+  }, [faceUp, reduceMotion, rotation]);
 
   // Pulse once the flip has finished.
   useEffect(() => {
-    if (!matched) return;
+    if (!matched || reduceMotion) return;
     scale.value = withDelay(
       FLIP_MS,
       withSequence(withSpring(1.1, PULSE_SPRING), withSpring(1, PULSE_SPRING)),
     );
-  }, [matched, scale]);
+  }, [matched, reduceMotion, scale]);
 
   // Shake after the flip, before the cards flip back (lock lasts 800 ms).
   useEffect(() => {
-    if (!mismatched) return;
+    if (!mismatched || reduceMotion) return;
     shake.value = withDelay(
       FLIP_MS + 50,
       withSequence(
@@ -63,7 +77,7 @@ function CardViewBase({
         withTiming(0, { duration: 50 }),
       ),
     );
-  }, [mismatched, shake]);
+  }, [mismatched, reduceMotion, shake]);
 
   const containerStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: shake.value }, { scale: scale.value }],
@@ -81,8 +95,13 @@ function CardViewBase({
   return (
     <Pressable
       onPress={() => onPress(index)}
+      disabled={matched}
       accessibilityRole="button"
-      accessibilityLabel={faceUp ? symbol : "Hidden card"}
+      accessibilityLabel={`Card ${index + 1}, ${
+        faceUp ? symbolName(symbol) : "face down"
+      }`}
+      aria-disabled={matched}
+      aria-selected={faceUp}
       style={{ width: size, height: size }}
     >
       <Animated.View style={[styles.fill, containerStyle]}>
@@ -91,15 +110,49 @@ function CardViewBase({
         >
           <View
             style={[
-              styles.ring,
-              { borderColor: theme.cardBackRing, borderRadius: 8 },
+              styles.frame,
+              { borderColor: theme.cardBackTrim, borderWidth: 2, margin: size * 0.06 },
             ]}
           />
-          <Animated.Text
-            style={{ fontSize: size * 0.45, color: theme.cardBackMark }}
+          <View
+            style={[
+              styles.frame,
+              {
+                borderColor: theme.cardBackTrim,
+                borderWidth: 1,
+                margin: size * 0.1,
+                opacity: 0.45,
+                borderRadius: 5,
+              },
+            ]}
+          />
+          <View
+            style={{
+              width: size * 0.5,
+              height: size * 0.5,
+              borderRadius: size * 0.25,
+              borderWidth: 2,
+              borderColor: theme.cardBackTrim,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
-            ?
-          </Animated.Text>
+            <Animated.Text
+              style={{ fontSize: size * 0.3, color: theme.cardBackTrim }}
+            >
+              ✦
+            </Animated.Text>
+          </View>
+          {CORNERS.map((c) => (
+            <View
+              key={c}
+              style={[
+                styles.pip,
+                { backgroundColor: theme.cardBackTrim },
+                PIP_POS[c],
+              ]}
+            />
+          ))}
         </Animated.View>
         <Animated.View
           style={[
@@ -131,9 +184,9 @@ const styles = StyleSheet.create({
     backfaceVisibility: "hidden",
   },
   front: { borderWidth: 2 },
-  ring: {
+  frame: {
     ...StyleSheet.absoluteFill,
-    margin: 6,
-    borderWidth: 2,
+    borderRadius: 8,
   },
+  pip: { position: "absolute", width: 5, height: 5, borderRadius: 3 },
 });

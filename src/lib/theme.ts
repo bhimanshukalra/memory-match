@@ -3,11 +3,14 @@ import { Appearance } from "react-native";
 
 export type Theme = {
   bg: string;
+  tray: string;
+  chip: string;
+  accent: string;
+  onAccent: string;
   text: string;
   label: string;
   cardBack: string;
-  cardBackRing: string;
-  cardBackMark: string;
+  cardBackTrim: string;
   cardFront: string;
   cardFrontBorder: string;
   matchBorder: string;
@@ -23,44 +26,50 @@ export type Theme = {
 };
 
 const light: Theme = {
-  bg: "#eef2ff",
-  text: "#312e81",
-  label: "#6366f1",
-  cardBack: "#4f46e5",
-  cardBackRing: "rgba(255,255,255,0.35)",
-  cardBackMark: "#e0e7ff",
+  bg: "#1e1b4b",
+  tray: "#272462",
+  chip: "#312e81",
+  accent: "#fbbf24",
+  onAccent: "#312e81",
+  text: "#ffffff",
+  label: "#a5b4fc",
+  cardBack: "#312e81",
+  cardBackTrim: "#fbbf24",
   cardFront: "#ffffff",
   cardFrontBorder: "#c7d2fe",
   matchBorder: "#22c55e",
   matchBg: "#f0fdf4",
-  button: "#4f46e5",
-  buttonText: "#ffffff",
-  modalBg: "#ffffff",
-  modalTitle: "#312e81",
-  modalText: "#4338ca",
-  badgeBg: "#fef3c7",
-  badgeText: "#b45309",
+  button: "#fbbf24",
+  buttonText: "#312e81",
+  modalBg: "#312e81",
+  modalTitle: "#fbbf24",
+  modalText: "#e0e7ff",
+  badgeBg: "#fbbf24",
+  badgeText: "#312e81",
   backdrop: "rgba(0,0,0,0.5)",
 };
 
 const dark: Theme = {
-  bg: "#0f172a",
-  text: "#e0e7ff",
+  bg: "#13112e",
+  tray: "#1c1a45",
+  chip: "#262367",
+  accent: "#fbbf24",
+  onAccent: "#312e81",
+  text: "#ffffff",
   label: "#a5b4fc",
-  cardBack: "#6366f1",
-  cardBackRing: "rgba(255,255,255,0.3)",
-  cardBackMark: "#e0e7ff",
-  cardFront: "#1e293b",
-  cardFrontBorder: "#475569",
+  cardBack: "#3730a3",
+  cardBackTrim: "#fbbf24",
+  cardFront: "#ffffff",
+  cardFrontBorder: "#c7d2fe",
   matchBorder: "#22c55e",
-  matchBg: "#14532d",
-  button: "#6366f1",
-  buttonText: "#ffffff",
-  modalBg: "#1e293b",
-  modalTitle: "#e0e7ff",
-  modalText: "#c7d2fe",
-  badgeBg: "#78350f",
-  badgeText: "#fde68a",
+  matchBg: "#f0fdf4",
+  button: "#fbbf24",
+  buttonText: "#312e81",
+  modalBg: "#262367",
+  modalTitle: "#fbbf24",
+  modalText: "#e0e7ff",
+  badgeBg: "#fbbf24",
+  badgeText: "#312e81",
   backdrop: "rgba(0,0,0,0.65)",
 };
 
