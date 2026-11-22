@@ -1,5 +1,5 @@
 import { memo, useEffect } from "react";
-import { Pressable, StyleSheet } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -8,6 +8,8 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
+
+import { useTheme } from "@/lib/theme";
 
 const FLIP_MS = 300;
 const PULSE_SPRING = { damping: 14, stiffness: 400 };
@@ -31,6 +33,7 @@ function CardViewBase({
   size,
   onPress,
 }: Props) {
+  const theme = useTheme();
   const rotation = useSharedValue(faceUp ? 180 : 0);
   const scale = useSharedValue(1);
   const shake = useSharedValue(0);
@@ -83,8 +86,18 @@ function CardViewBase({
       style={{ width: size, height: size }}
     >
       <Animated.View style={[styles.fill, containerStyle]}>
-        <Animated.View style={[styles.face, styles.back, backStyle]}>
-          <Animated.Text style={[styles.mark, { fontSize: size * 0.5 }]}>
+        <Animated.View
+          style={[styles.face, { backgroundColor: theme.cardBack }, backStyle]}
+        >
+          <View
+            style={[
+              styles.ring,
+              { borderColor: theme.cardBackRing, borderRadius: 8 },
+            ]}
+          />
+          <Animated.Text
+            style={{ fontSize: size * 0.45, color: theme.cardBackMark }}
+          >
             ?
           </Animated.Text>
         </Animated.View>
@@ -92,7 +105,10 @@ function CardViewBase({
           style={[
             styles.face,
             styles.front,
-            matched && styles.frontMatched,
+            {
+              backgroundColor: matched ? theme.matchBg : theme.cardFront,
+              borderColor: matched ? theme.matchBorder : theme.cardFrontBorder,
+            },
             frontStyle,
           ]}
         >
@@ -114,8 +130,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backfaceVisibility: "hidden",
   },
-  back: { backgroundColor: "#4f46e5" },
-  front: { backgroundColor: "#ffffff", borderWidth: 2, borderColor: "#c7d2fe" },
-  frontMatched: { borderColor: "#22c55e", backgroundColor: "#f0fdf4" },
-  mark: { color: "#e0e7ff" },
+  front: { borderWidth: 2 },
+  ring: {
+    ...StyleSheet.absoluteFill,
+    margin: 6,
+    borderWidth: 2,
+  },
 });

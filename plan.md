@@ -118,10 +118,10 @@ Goal: best score per difficulty survives app restarts.
 
 Goal: finished feel on a real device.
 
-- [ ] `expo-haptics`: `selectionAsync` on flip, `notificationAsync(Success)` on match and win, `Warning` on mismatch. Wrap in try/catch and skip on web or unsupported devices.
-- [ ] Color palette, card-back design, typography, spacing; support light and dark if cheap.
-- [ ] App icon and splash screen via `app.json` (check the SDK 58 `expo-splash-screen` config).
-- [ ] Layout hardening: small phones, tablets, portrait and landscape (recompute card size on dimension change; cap the board width on tablets).
+- [x] `expo-haptics`: `selectionAsync` on flip, `notificationAsync(Success)` on match and win, `Warning` on mismatch. Wrap in try/catch and skip on web or unsupported devices.
+- [x] Color palette, card-back design, typography, spacing; support light and dark if cheap.
+- [x] App icon and splash screen via `app.json` (check the SDK 58 `expo-splash-screen` config).
+- [x] Layout hardening: small phones, tablets, portrait and landscape (recompute card size on dimension change; cap the board width on tablets).
 
 **Done when:** the app looks consistent and the grid fits all tested sizes.
 

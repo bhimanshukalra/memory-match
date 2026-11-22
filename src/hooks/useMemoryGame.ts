@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useReducer, useState } from "react";
 
 import { gameReducer, initialState } from "@/lib/gameReducer";
+import { successHaptic, tapHaptic, warningHaptic } from "@/lib/haptics";
 import { makeDeck } from "@/lib/shuffle";
 import { isBetter, loadBest, saveBest } from "@/lib/storage";
 import type { BestScore } from "@/lib/types";
@@ -36,6 +37,20 @@ export function useMemoryGame() {
     if (!isNewBest) return;
     saveBest(DIFFICULTY, { moves: state.moves, seconds: state.seconds });
   }, [isNewBest, state.moves, state.seconds]);
+
+  // Haptics: tap on flip, success on match/win, warning on mismatch.
+  useEffect(() => {
+    if (state.flipped.length > 0) tapHaptic();
+  }, [state.flipped]);
+  useEffect(() => {
+    if (state.matched.size > 0) successHaptic();
+  }, [state.matched]);
+  useEffect(() => {
+    if (state.locked) warningHaptic();
+  }, [state.locked]);
+  useEffect(() => {
+    if (state.won) successHaptic();
+  }, [state.won]);
 
   // Mismatch: keep both cards visible briefly, then flip back. Input is locked
   // meanwhile. Cleanup also cancels the pending timeout on restart/unmount.

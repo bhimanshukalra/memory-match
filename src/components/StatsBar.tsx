@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 
 import { formatTime } from "@/lib/format";
+import { useTheme } from "@/lib/theme";
 import type { BestScore } from "@/lib/types";
 
 type Props = {
@@ -10,10 +11,11 @@ type Props = {
 };
 
 function Stat({ label, value }: { label: string; value: string }) {
+  const theme = useTheme();
   return (
     <View style={styles.stat}>
-      <Text style={styles.label}>{label}</Text>
-      <Text style={styles.value}>{value}</Text>
+      <Text style={[styles.label, { color: theme.label }]}>{label}</Text>
+      <Text style={[styles.value, { color: theme.text }]}>{value}</Text>
     </View>
   );
 }
@@ -36,9 +38,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     width: "100%",
+    maxWidth: 640,
     paddingHorizontal: 16,
+    paddingTop: 8,
   },
   stat: { alignItems: "center" },
-  label: { fontSize: 12, color: "#6366f1", textTransform: "uppercase" },
-  value: { fontSize: 22, fontWeight: "700", color: "#312e81" },
+  label: { fontSize: 12, letterSpacing: 1, textTransform: "uppercase" },
+  value: { fontSize: 22, fontWeight: "700" },
 });
