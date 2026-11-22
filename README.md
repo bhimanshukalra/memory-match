@@ -1,56 +1,105 @@
-# Welcome to your Expo app 👋
+# Memory Match
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A card-matching memory game built with Expo and React Native. A grid of face-down cards hides pairs of matching symbols. Flip two cards per turn: matches stay face up, mismatches flip back. Clear the board in as few moves and as little time as you can. Best scores are saved on the device.
 
-## Get started
+Single player, fully offline, no backend.
 
-1. Install dependencies
+| Portrait (Expert, 6×6) | Wide layout (Medium, 4×4) |
+| --- | --- |
+| <img src="docs/screenshots/expert.jpg" alt="Expert 6x6 board in portrait" width="260"> | <img src="docs/screenshots/wide.jpg" alt="Side-by-side layout on a wide screen" width="420"> |
 
-   ```bash
-   npm install
-   ```
+## Features
 
-2. Start the app
+- **Four difficulty levels:** Easy 3×4, Medium 4×4, Hard 4×5 and Expert 6×6. Your last choice is remembered.
+- **Best scores per level**, stored locally: fewest moves wins, with time as the tiebreaker. A "New best!" badge appears on the win screen.
+- **Animations** (Reanimated): 3D card flip, match pulse, mismatch shake and an animated win screen. They respect the system "Reduce Motion" setting.
+- **Haptics** for flips, matches, mismatches and wins (iOS and Android; skipped on web).
+- **Responsive layout:** a single column on phones, and a board-plus-side-panel layout on wide windows such as tablets or the open iPhone Duo.
+- **Accessibility:** cards are announced by position and name ("Card 5, apple"), matches, mismatches and wins are announced, and the win dialog is modal for VoiceOver and TalkBack.
+- **Dark and light** system themes.
 
-   ```bash
-   npx expo start
-   ```
+## Getting started
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+Requirements: Node 22 or newer and npm.
 
 ```bash
-npm run reset-project
+npm install
+npx expo start
 ```
 
-This command will move the starter code to the **example** directory and create a blank **src/app** directory where you can start developing.
+Then press `w` for the web build, or scan the QR code for a native build.
 
-### Other setup steps
+### Native builds (development build)
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+This project uses Expo SDK 58, which is newer than the Expo Go app in the stores, so run it as a development build:
 
-## Learn more
+```bash
+npx expo run:ios      # needs Xcode
+npx expo run:android  # needs Android Studio
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+On iOS, CocoaPods needs a UTF-8 locale. If the build fails with an `Encoding::CompatibilityError` from `pod`, set one first:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+export LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
+```
 
-## Join the community
+`ios/` and `android/` are generated (Continuous Native Generation) and git-ignored. Native settings live in `app.json` and config plugins.
 
-Join our community of developers creating universal apps.
+## Scripts
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+| Command | What it does |
+| --- | --- |
+| `npm start` | Start the Expo dev server |
+| `npm run web` | Start the web build |
+| `npm run ios` / `npm run android` | Start for a simulator or emulator |
+| `npm test` | Run the Jest test suite (`jest-expo`) |
+| `npm run typecheck` | Type-check with `tsc --noEmit` |
+| `npm run lint` | Lint with `expo lint` |
+
+CI (`.github/workflows/ci.yml`) runs lint, typecheck and tests on every push to `main` and every pull request.
+
+## Project structure
+
+```
+src/
+  app/            Expo Router routes (index.tsx renders the game)
+  components/     GameScreen, Board, CardView, StatsBar, DifficultyPicker, WinModal
+  hooks/
+    useMemoryGame.ts   game state, timers, best scores, haptics and announcements
+  lib/
+    gameReducer.ts     pure game rules (FLIP, RESOLVE, TICK, RESTART)
+    shuffle.ts         Fisher-Yates shuffle and deck building
+    difficulty.ts      difficulty levels
+    symbols.ts         card symbols and their spoken names
+    storage.ts         AsyncStorage helpers for best scores and difficulty
+    theme.ts           light and dark palettes
+```
+
+The game rules are a plain reducer in `src/lib/gameReducer.ts`, so they are easy to test without rendering anything. The hook adds the side effects around it: the mismatch delay, the timer, persistence, haptics and screen-reader announcements.
+
+## Testing
+
+```bash
+npm test
+```
+
+The suite covers the reducer, deck building and shuffling, storage (including corrupt data and failing storage), difficulty levels, and the `useMemoryGame` hook (timers, mismatch delay, best scores, difficulty persistence, and single-fire haptics).
+
+## Building and releasing
+
+EAS profiles are in `eas.json` (`development`, `preview`, `production`):
+
+```bash
+npx eas-cli@latest build --profile preview --platform all
+```
+
+Before a store release, replace the bundle identifier and Android package in `app.json` (currently `com.bhimanshukalra.memorymatch`) if you want a different one. Store identifiers cannot be changed once published.
+
+## Background
+
+`MVP.md` is the original one-day build guide and `plan.md` is the phased plan this app was built from.
+
+## License
+
+See [LICENSE](LICENSE).
